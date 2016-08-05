@@ -1,0 +1,23 @@
+{
+  "require": {
+    "bitwasp/buffertools": "v0.3.*",
+    "rgooding/protobuf-php": "v0.0.1",
+    "react/socket": "v0.4.3",
+    "react/socket-client": "v0.5.0",
+    "clue/socks-react": "~0.4",
+    "dunglas/php-torcontrol": "v1.0.0",
+    "christian-riesen/base32": "^1.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "Ricochet\\": "src/Ricochet/"
+    },
+    "files": [
+      "src/AuthHiddenService-extensions.php",
+      "src/ContactRequest-extensions.php"
+    ]
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "v2.0"
+  }
+}

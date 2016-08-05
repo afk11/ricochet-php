@@ -1,0 +1,6 @@
+protoc --proto_path='/usr/share/php/DrSlump/Protobuf/Compiler/protos'   --plugin=protoc-gen-php='/usr/bin/protoc-gen-php'     --proto_path=':resource'     --php_out=':src/'     'resource/Control.proto'
+protoc --proto_path='/usr/share/php/DrSlump/Protobuf/Compiler/protos'   --plugin=protoc-gen-php='/usr/bin/protoc-gen-php'     --proto_path=':resource'     --php_out=':src/'     'resource/AuthHiddenService.proto'
+protoc --proto_path='/usr/share/php/DrSlump/Protobuf/Compiler/protos'   --plugin=protoc-gen-php='/usr/bin/protoc-gen-php'     --proto_path=':resource'     --php_out=':src/'     'resource/ContactRequest.proto'
+protoc --proto_path='/usr/share/php/DrSlump/Protobuf/Compiler/protos'   --plugin=protoc-gen-php='/usr/bin/protoc-gen-php'     --proto_path=':resource'     --php_out=':src/'     'resource/Chat.proto'
+rm src/descriptor.php
+rm src/php.php
