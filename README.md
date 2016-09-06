@@ -30,14 +30,11 @@ https://github.com/drslump/Protobuf-PHP#installation
     pear channel-discover pear.pollinimini.net
     pear install drslump/Protobuf-beta
 
-  protoc \
-    --plugin=protoc-gen-php='/usr/bin/protoc-gen-php' \
-    --proto_path='/home/user/git/ricochet-im/resource/' \
-    --php_out=':src/Channel/Proto' \
-
-protoc \
+protoc \ 
     --plugin=protoc-gen-php='/usr/bin/protoc-gen-php' \
     --proto_path=':resource/' \
     --proto_path=':vendor/rgooding/library/DrSlump/Protobuf/Compiler/protos' \
     --php_out=':src/' \
     '/home/user/git/ricochet-im/resource/protocol-controlchannel.proto'
+
+Or probably (it's been a while), run `build_proto`, modifying the script if you add new .proto files.
