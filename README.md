@@ -11,6 +11,13 @@ Amazingly, my implementation of signData() works just fine, but sign256 seems to
 
 > No idea why, I've tried numerous things short of implementing the entire PKCS#2 signing procedure. This is not the solution we are looking for!
 
+To test: 
+
+ * set up tor using their debian repository
+ * in your torrc expose the ControlPort, and create a password (`tor --hash-password testtesttesttest`)
+ * take your ricochet client ID (without the protocol prefix) and update connect.php
+ * generate a new RSA private key for your bot, and update connect.php
+ * run connect.php - you'll connect, but fail auth due to an invalid sig. 
 
 ### Ricochet-IM for PHP
 

@@ -30,7 +30,7 @@ $torControl = new TorControl\TorControl([
     'hostname' => '127.0.0.1',
     'port'     => 9051,
     'password' => 'testtesttesttest',
-    'authmethod' => 1
+    'authmethod' => \TorControl\TorControl::AUTH_METHOD_HASHEDPASSWORD
 ]);
 
 $torControl->connect();
@@ -50,7 +50,7 @@ $params->setSupportedVersions([1]);
 $loop = React\EventLoop\Factory::create();
 $socket = new React\Socket\Server($loop);
 $socket->on('connection', function ($conn) {
-    echo "Received a connection!\n";
+    echo "Server received a connection!\n";
 });
 $socket->listen(9878);
 
