@@ -4,7 +4,7 @@ import "php.proto";
 package Ricochet.Channel.Chat;
 option (php.namespace) = "Ricochet.Channel.Chat.Proto";
 option (php.multifile) = true;
-dd
+
 message Packet {
     optional ChatMessage chat_message = 1;
     optional ChatAcknowledge chat_acknowledge = 2;

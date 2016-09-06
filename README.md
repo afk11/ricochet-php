@@ -1,10 +1,28 @@
+### WARNING
+
+This codebase is a work in progress, which doesn't even work correctly. 
+
+ * I'm publishing to Github in case someone else can fix the issue (described later).
+ 
+ * Besides one feature not working, the code that I assume to be working may, infact, be broken. 
+ 
+The blocker for me right now is matching richochet's test vectors for the Cryptokey::sign256 function.
+Amazingly, my implementation of signData() works just fine, but sign256 seems to fail when provided with short strings.
+
+> No idea why, I've tried numerous things short of implementing the entire PKCS#2 signing procedure. This is not the solution we are looking for!
+
+
 ### Ricochet-IM for PHP
 
-#### Requirements (for installation):
+#### Requirements (installation for consumers):
 
-#### Requirements (for contributors):
+No composer package yet, but tor >= 2.7.1 is required for ephemeral hidden services. 
+ 
+This can be installed via the Tor projects debian repository, check their website for instructions.
 
-If you're working on protobufs, you'll need the compiler available: 
+#### Requirements (installation for contributors):
+
+If you're working on protobufs, you'll need the compiler: 
 
 https://github.com/drslump/Protobuf-PHP#installation
 

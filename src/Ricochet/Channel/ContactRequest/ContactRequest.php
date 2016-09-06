@@ -3,13 +3,15 @@
 namespace Ricochet\Channel\ContactRequest;
 
 
+use Ricochet\Channel\ChannelInterface;
 use Ricochet\Channel\ContactRequest\Proto\Response;
 use Ricochet\Channel\Control\Proto\ChannelResult;
 use Ricochet\Channel\Control\Proto\OpenChannel;
 use Ricochet\Channel\Control\Proto\Packet;
 use Ricochet\Connection;
+use Ricochet\Protocol\Message\Message;
 
-class ContactRequest
+class ContactRequest implements ChannelInterface
 {
     const CHANNEL = 'im.ricochet.contact.request';
 
@@ -25,7 +27,6 @@ class ContactRequest
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
-        $this->connection->on('msg', [$this, 'onMessage']);
     }
 
     /**
@@ -152,6 +153,22 @@ class ContactRequest
     }
 
     /**
+     * @param OpenChannel $openChannel
+     */
+    public function onOpenChannel(OpenChannel $openChannel)
+    {
+        // TODO: Implement onChannelResult() method.
+    }
+
+    /**
+     * @param ChannelResult $channelResult
+     */
+    public function onChannelResult(ChannelResult $channelResult)
+    {
+        // TODO: Implement onChannelResult() method.
+    }
+
+    /**
      * @param int $id
      * @param int $status
      * @param int $errorCode
@@ -164,5 +181,11 @@ class ContactRequest
         $packet = new Packet();
         $packet->setChannelResult($channelResult);
         $this->connection->send($packet->serialize());
+    }
+
+    public function onMessage(Message $message)
+    {
+
+        // TODO: Implement onMessage() method.
     }
 }

@@ -2,15 +2,18 @@
 
 namespace Ricochet\Channel\Control;
 
+use Evenement\EventEmitter;
+use Ricochet\Channel\ChannelInterface;
 use Ricochet\Channel\Control\Proto\ChannelResult;
 use Ricochet\Channel\Control\Proto\EnableFeatures;
+use Ricochet\Channel\Control\Proto\FeaturesEnabled;
 use Ricochet\Channel\Control\Proto\KeepAlive;
 use Ricochet\Channel\Control\Proto\OpenChannel;
 use Ricochet\Channel\Control\Proto\Packet;
 use Ricochet\Connection;
 use Ricochet\Protocol\Message\Message;
 
-class ControlChannel
+class ControlChannel extends EventEmitter implements ChannelInterface
 {
 
     /**
@@ -25,7 +28,10 @@ class ControlChannel
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
-        $this->connection->on('msg', [$this, 'onMessage']);
+        $that = $this;
+        $this->on('channel.result', [$that, 'onChannelResult']);
+        $this->on('channel.open', [$that, 'onOpenChannel']);
+        $this->on('channel.enablefeatures', [$that, 'onEnableFeatures']);
     }
 
     /**
@@ -156,19 +162,63 @@ class ControlChannel
     }
 
     /**
+     * @param ChannelResult $channelResult
+     */
+    public function onChannelResult(ChannelResult $channelResult)
+    {
+        $channel = $this->connection->channel($channelResult->getChannelIdentifier());
+        $channel->onChannelResult($channelResult);
+    }
+
+    /**
+     * @param OpenChannel $openChannel
+     */
+    public function onOpenChannel(OpenChannel $openChannel)
+    {
+
+    }
+
+    /**
+     * @param EnableFeatures $enableFeatures
+     */
+    public function onEnableFeatures(EnableFeatures $enableFeatures)
+    {
+
+    }
+
+    /**
+     * @param FeaturesEnabled $featuresEnabled
+     */
+    public function onFeaturesEnabled(FeaturesEnabled $featuresEnabled)
+    {
+
+    }
+
+    /**
+     * @param KeepAlive $keepAlive
+     */
+    public function onKeepAlive(KeepAlive $keepAlive)
+    {
+
+    }
+
+    /**
      * @param Message $message
-     * @return bool
+     * @return Packet
      */
     public function onMessage(Message $message)
     {
-        try {
-            $parsed = new Proto\Packet();
-            $parsed->parse($message->getData());
-
-
-            return true;
-        } catch (\Exception $e) {
-            return false;
+        $packet = new Proto\Packet($message->getData());
+        if ($packet->hasChannelResult()) {
+            $this->emit('channel.result', [$packet->getChannelResult()]);
+        } elseif ($packet->hasOpenChannel()) {
+            $this->emit('channel.open', [$packet->getOpenChannel()]);
+        } elseif ($packet->hasEnableFeatures()) {
+            $this->emit('channel.enablefeatures', [$packet->getEnableFeatures()]);
+        } elseif ($packet->hasFeaturesEnabled()) {
+            $this->emit('channel.featuresenabled', [$packet->getFeaturesEnabled()]);
+        } elseif ($packet->hasKeepAlive()) {
+            $this->emit('channel.keepalive', [$packet->getKeepAlive()]);
         }
     }
 }

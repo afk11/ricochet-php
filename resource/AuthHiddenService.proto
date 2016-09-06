@@ -1,4 +1,4 @@
-
+import "php.proto";
 import "Control.proto";
 
 package Ricochet.Channel.AuthHiddenService;

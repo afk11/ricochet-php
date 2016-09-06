@@ -22,6 +22,11 @@ class TorService
         $this->control = $control;
     }
 
+    /**
+     * @param array $fields
+     * @param array $response
+     * @return array
+     */
     public function parseResponse(array $fields, array $response)
     {
         $data = [];
@@ -41,13 +46,15 @@ class TorService
         return $data;
     }
 
-
+    /**
+     * @param HiddenServiceParams $params
+     * @return array
+     */
     public function createEphemeralHiddenService(HiddenServiceParams $params)
     {
         $command = $params->generateCommand();
         $res = $this->control->executeCommand($command);
 
-        var_dump($res);
         $fields = ['ServiceID'];
         if ($params->getKeyType() === 'NEW') {
             $fields[] = 'PrivateKey';
@@ -57,10 +64,14 @@ class TorService
         return $parsed;
     }
 
-    public function deleteOnion($serviceId)
+    /**
+     * @param string $serviceId
+     * @return array
+     */
+    public function deleteEphemeralHiddenService($serviceId)
     {
-        $command = 'DEL_ONION '. $_SERVER;
+        $command = 'DEL_ONION '. $serviceId;
         $res = $this->control->executeCommand($command);
-
+        return $res;
     }
 }

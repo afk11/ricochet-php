@@ -55,9 +55,19 @@ class PublicKey
      * @param string $signature
      * @return int
      */
-    public function verify($data, $signature)
+    public function verifyData($data, $signature)
     {
-        return openssl_verify($data, $signature, $this->public) === 1;
+        return $this->verifySha256(hash('sha256', $data, true), $signature);
+    }
+
+    /**
+     * @param string $data
+     * @param string $signature
+     * @return int
+     */
+    public function verifySha256($data, $signature)
+    {
+        return openssl_verify($data, $signature, $this->public, OPENSSL_ALGO_SHA256) === 1;
     }
 
     /**
@@ -66,6 +76,15 @@ class PublicKey
     public function getPemFormatted()
     {
         return $this->pem;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDerFormatted()
+    {
+        $der= $this->pem2der($this->getPemFormatted());;
+        return substr($der, 22);
     }
 
     /**

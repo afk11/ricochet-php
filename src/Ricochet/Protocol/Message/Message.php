@@ -29,10 +29,19 @@ class Message
      */
     public function __construct($channelId, $contentLen, $content)
     {
-        echo "Received message!\n";
         $this->channelId = $channelId;
         $this->dataLen = $contentLen;
         $this->data = $content;
+    }
+
+    /**
+     * @param $id
+     * @param $content
+     * @return Message
+     */
+    public static function create($id, $content)
+    {
+        return new self($id, strlen($content) + 4, $content);
     }
 
     /**
@@ -64,10 +73,6 @@ class Message
      */
     public function getBuffer()
     {
-        if ($this->dataLen != strlen($this->data)) {
-            throw new \RuntimeException('Data length mismatch - unable to serialize');
-        }
-
         $packet = pack("nn", $this->dataLen, $this->channelId) . $this->data;
         return new Buffer($packet);
     }

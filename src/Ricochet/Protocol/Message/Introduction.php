@@ -29,6 +29,9 @@ class Introduction
         return $this->versions;
     }
 
+    /**
+     * @return Buffer
+     */
     public function getBuffer()
     {
         $versions = "\x49\x4d";

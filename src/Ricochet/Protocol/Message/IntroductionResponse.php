@@ -2,6 +2,8 @@
 
 namespace Ricochet\Protocol\Message;
 
+use BitWasp\Buffertools\Buffer;
+
 class IntroductionResponse
 {
     const NO_VERSION = 0xff;
@@ -40,5 +42,13 @@ class IntroductionResponse
     public function getVersion()
     {
         return $this->selectedVersion;
+    }
+
+    /**
+     * @return Buffer
+     */
+    public function getBuffer()
+    {
+        return new Buffer(ord($this->selectedVersion));
     }
 }

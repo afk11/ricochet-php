@@ -1,7 +1,6 @@
 <?php
-require "vendor/autoload.php";
-require "src/AuthHiddenService-extensions.php";
-require "src/ContactRequest-extensions.php";
+
+require __DIR__ . '/../src/bootstrap.php';
 
 $connection= new \Ricochet\Connection();
 $Auth = new \Ricochet\Channel\AuthHiddenService\AuthHiddenService($connection);
