@@ -165,6 +165,8 @@ class AuthHiddenService extends EventEmitter implements ChannelInterface
      */
     public function generateProofString($clientCookie, $clientHost, $serverCookie, $serverHost)
     {
+        echo "proof: " . $clientHost. $serverHost.PHP_EOL;
+        echo "salt: " . $clientCookie . $serverCookie.PHP_EOL;
         return hash_hmac('sha256', $clientHost . $serverHost, $clientCookie . $serverCookie, true);
     }
 
@@ -179,12 +181,11 @@ class AuthHiddenService extends EventEmitter implements ChannelInterface
     public function prepareProof($clientCookie, $clientHost, $serverCookie, $serverHost, PrivateKey $privateKey)
     {
         $proofData = $this->generateProofString($clientCookie, $clientHost, $serverCookie, $serverHost);
-        echo "Proof: " . bin2hex($proofData) . PHP_EOL;
         $signature = $privateKey->signSha256($proofData);
         if (!$privateKey->getPublicKey()->verifySha256($proofData, $signature)) {
             throw new \RuntimeException('Exceptional circumstances');
         }
-        echo "Signature: " .strlen($signature)  . " - ". bin2hex($signature) . PHP_EOL;
+
         $proof = new Proof();
         $proof->setPublicKey($privateKey->getPublicKey()->getDerFormatted());
         $proof->setSignature($signature);

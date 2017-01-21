@@ -116,18 +116,22 @@ class Connection extends EventEmitter
             try {
                 $response = IntroductionResponse::parse($data);
                 if ($response->getVersion() === IntroductionResponse::NO_VERSION) {
+                    echo "response reject no version\n";
                     $deferred->reject($this);
                     return;
                 }
 
                 if (!in_array($response->getVersion(), $params->getSupportedVersions())) {
+                    echo "unsupported version\n";
                     $deferred->reject($this);
                 }
 
+                echo "setting up channel \n";
                 $this->handshake = true;
                 $this->addNewChannel(0, new ControlChannel($this));
                 $deferred->resolve($this);
             } catch (\Exception $e) {
+                echo "introduction exception: " . $e->getMessage().PHP_EOL;
                 $deferred->reject($this);
             }
         });

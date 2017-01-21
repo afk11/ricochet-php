@@ -202,18 +202,19 @@ class HiddenServiceParams
         $explode = explode(":", $target);
         $size = count($explode);
         if (1 === $size) {
-            $port = $explode[0];
+            $port = (int) $explode[0];
             if (!$this->validatePort($port)) {
-                throw new \RuntimeException('Failed to validate target port');
+                throw new \RuntimeException('Failed to validate target port: \''.$port.'\'');
             }
         } else if (2 === $size) {
             list ($ip, $port) = $explode;
+            $port = (int) $port;
             if (!filter_var($ip, FILTER_VALIDATE_IP)) {
                 throw new \RuntimeException('Failed to validate IP');
             }
 
             if (!$this->validatePort($port)) {
-                throw new \RuntimeException('Failed to validate target port');
+                throw new \RuntimeException('Failed to validate target port: \''.$port.'\'');
             }
         } else {
             throw new \RuntimeException('Unparsable target');

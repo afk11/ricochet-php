@@ -4,6 +4,7 @@ namespace Ricochet\Key;
 
 
 use Base32\Base32;
+use phpseclib\Crypt\RSA;
 
 class PublicKey
 {
@@ -16,6 +17,11 @@ class PublicKey
      * @var string
      */
     private $pem;
+
+    /**
+     * @var RSA
+     */
+    private $rsa;
 
     /**
      * PublicKey constructor.
@@ -39,14 +45,17 @@ class PublicKey
             throw new \RuntimeException('No remaining options for parsing public key');
         }
 
-        $public = openssl_pkey_get_public($subjectKey);
-        if (false === $public || !is_resource($public)) {
-            throw new \RuntimeException('Unable to parse publicc key');
+        $rsa = new RSA();
+        $rsa->setHash('sha256');
+        $rsa->setMGFHash('sha256');
+        if (!$rsa->loadKey($subjectKey)) {
+            throw new \RuntimeException('Unable to parse public key');
         }
+        $rsa->setSignatureMode(RSA::SIGNATURE_PKCS1);
 
         $this->pem = $pem;
         echo "public key has str: ".$pem.PHP_EOL;
-        $this->public = $public;
+        $this->rsa = $rsa;
 
     }
 
@@ -57,7 +66,7 @@ class PublicKey
      */
     public function verifyData($data, $signature)
     {
-        return $this->verifySha256(hash('sha256', $data, true), $signature);
+        return $this->verifySHA256(hash('sha256', $data, true), $signature);
     }
 
     /**
@@ -65,9 +74,15 @@ class PublicKey
      * @param string $signature
      * @return int
      */
-    public function verifySha256($data, $signature)
+    public function verifySHA256($data, $signature)
     {
-        return openssl_verify($data, $signature, $this->public, OPENSSL_ALGO_SHA256) === 1;
+        try {
+            return $this->rsa->verify($data, $signature);
+        } catch (\Exception $e) {
+            echo "exception\n";
+            echo $e->getMessage().PHP_EOL;
+            return false;
+        }
     }
 
     /**

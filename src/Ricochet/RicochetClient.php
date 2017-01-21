@@ -5,6 +5,7 @@ namespace Ricochet;
 use Clue\React\Socks\Client;
 use React\EventLoop\LoopInterface;
 use React\Promise\PromiseInterface;
+use React\SocketClient\TcpConnector;
 use React\Stream\Stream;
 use Ricochet\Protocol\Message\Introduction;
 
@@ -18,7 +19,7 @@ class RicochetClient
     private $params;
 
     /**
-     * @var \Clue\React\Socks\Connector
+     * @var Client
      */
     private $connector;
 
@@ -27,12 +28,10 @@ class RicochetClient
      * @param LoopInterface $loop
      * @param string $proxyUrl
      */
-    public function __construct(LoopInterface $loop, ParamsInterface $params, $proxyUrl = 'socks://127.0.0.1:9050')
+    public function __construct(LoopInterface $loop, ParamsInterface $params, $proxyUrl = '127.0.0.1:9050')
     {
-        $client = new Client($proxyUrl, $loop);
-        $client->setResolveLocal(false);
         $this->params = $params;
-        $this->connector = $client->createConnector();
+        $this->connector = new Client($proxyUrl, new TcpConnector($loop), $loop);
     }
 
     /**
@@ -46,7 +45,6 @@ class RicochetClient
         /** @var PromiseInterface $promise */
         $promise = $this->connector->create($url, $port);
         return $promise->then(function (Stream $stream) {
-            echo "Connected\n";
             $connection = new Connection();
             return $connection->initializeOutbound($stream, $this->params);
         });

@@ -24,41 +24,39 @@ oWmjVu7HYpVUCPI87t9fZzo/GZ+AAKPhFLpLEbnDpvS8yau0bVxM9Zk/p9/BTGUM
 coLqkASQC28sJg==
 -----END PRIVATE KEY-----
 ');
-$remoteId = 'bvs43bfavogohkqz';
+$remoteId = getenv('RICOCHET_TESTING_IDENTITY');
 
 $torControl = new TorControl\TorControl([
     'hostname' => '127.0.0.1',
     'port'     => 9051,
-    'password' => 'testtesttesttest',
-    'authmethod' => \TorControl\TorControl::AUTH_METHOD_HASHEDPASSWORD
+    'password' => getenv('TOR_CONTROL_PASS'),
+    'authmethod' => \TorControl\TorControl::AUTH_METHOD_HASHEDPASSWORD,
 ]);
 
 $torControl->connect();
 $torControl->authenticate();
+
+$localPort = 12301;
+$ricochetPort = 9878;
 
 $torService = new \Ricochet\Tor\Control\TorService($torControl);
 $torService->createEphemeralHiddenService(
     (new \Ricochet\Tor\HiddenServiceParams())
         ->withKey($privateKey)
         ->detach()
-        ->target(9878)
+        ->target($ricochetPort, $localPort)
 );
 
 $params = new Params();
 $params->setSupportedVersions([1]);
 
 $loop = React\EventLoop\Factory::create();
-$socket = new React\Socket\Server($loop);
-$socket->on('connection', function ($conn) {
-    echo "Server received a connection!\n";
-});
-$socket->listen(9878);
 
 $client = new RicochetClient($loop, $params);
 
 // ricochet instance
-$client->connect($remoteId)->then(function (\Ricochet\Connection $conn) use ($socket, $privateKey, $remoteId) {
-    $conn->on('close', [$socket, 'shutdown']);
+$client->connect($remoteId)->then(function (\Ricochet\Connection $conn) use ($privateKey, $remoteId) {
+    echo 'connect';
 
     $hsId = 1;
     $hsChannel = new \Ricochet\Channel\AuthHiddenService\AuthHiddenService($conn);

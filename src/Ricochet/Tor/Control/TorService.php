@@ -4,6 +4,7 @@ namespace Ricochet\Tor\Control;
 
 
 use Ricochet\Tor\HiddenServiceParams;
+use TorControl\Exception\TorError;
 use TorControl\TorControl;
 
 class TorService
@@ -27,23 +28,28 @@ class TorService
      * @param array $response
      * @return array
      */
-    public function parseResponse(array $fields, array $response)
+    public function parseResponse(array $fields, $response)
     {
-        $data = [];
-        foreach ($response as $item) {
-            if (strpos($item['message'], "=")) {
-                list ($key, $value) = explode("=", $item['message']);
-                $data[$key] = $value;
+        if ($response instanceof TorError) {
+            throw $response;
+        } else if (is_array($response)) {
+            $data = [];
+            foreach ($response as $item) {
+                if (strpos($item['message'], "=")) {
+                    list ($key, $value) = explode("=", $item['message']);
+                    $data[$key] = $value;
+                }
             }
+
+            foreach (array_keys($data) as $field) {
+                if (!in_array($field, $fields)) {
+                    throw new \RuntimeException('Unexpected value');
+                }
+            }
+            return $data;
         }
 
-        foreach (array_keys($data) as $field) {
-            if (!in_array($field, $fields)) {
-                throw new \RuntimeException('Unexpected value');
-            }
-        }
-
-        return $data;
+        throw new \RuntimeException('Unhandled response');
     }
 
     /**

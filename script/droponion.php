@@ -3,20 +3,20 @@
 require __DIR__ . '/../src/bootstrap.php';
 
 $serialized = '-----BEGIN PRIVATE KEY-----
-MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAN3VY48WRjup96fB
-TisT3+Uw1OnbmdvB1rGrAObFK9JT8TUXAlz0V54uCF0TedH/dtTd6L010KNgD2fV
-2jBHLXzOym51q3lrkpHxSTOqp5pVM6U1y2KJ/QhnTIGGpk/h30LWbINXYaPRxMD6
-dV4X+2uVDSLRHbjeRAn0a5eqmXY5AgMBAAECgYEAhnJWLNqrJm4VEy8tWR5qjFXU
-NQhLb81DedrSaQsHTCpj/nE7lWrhz5TGrOKo6oWSV+FGtaZwFRSbQaty2d/JyMIO
-ReGysJiQ0qkGH2Yps6olurUHm3F/jIiRCLN0b6oQK5irP6VOo8kfdzV2zXIDY7Fj
-Jfb034Tvqp+5CeWqtoECQQDvYZApCBH5DNKiesVn4zFsFG9VVyxvzBnbkvsW+G/G
-FpZvWH5g+Z8WXWX27nexiCd3whtA8Q1MHHUHAHPzTdplAkEA7Tv1jbRaVHQKhfi1
-O4qmWLDWuqUWija4JfWIrQ4enCvxfSdaStKWfw52XGEWS4ey8Iuw7WDcE/2CyCr8
-voklRQJAPVw11r6x1LQbvfhYZ6POBFVMoISC6HlZ23XWlPHDvPQHRa1aX8M8qz/v
-phdEaSZsb386+y+O6AaXXN8Z2bEIHQJAUnMJR4OL9VgTJDao/hWU9LQZHOstZ0HX
-RFIOe16x4sMe/clEh0ajSWtEVZzke8Ggvhs+lXGZa1UrM9hE2Q+fJQJBAOpw53SQ
-61V6CuW7BuTCke8J3p2aUTTdYEQUdKViEyMMtEOQmSlf2Nhr74ony1vs2Bg9+D8P
-r0oT3u5/c4yPPs4=
+MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAMWSPesEAAjLAjFp
+KFPiRIE0u04iLt0bIp3bw0xyTb0zuhYviSjY762U68IIG4/s6kPEKGuqe2rfK3vD
+PEp8824/tTx9895frNs4I0nb9Nk1s2PP8Rm3uedMGn4hAZMXAvxY5aPI9gDr5QDI
+URDTKRM8RpBGn1gr9vkEPQJw8tOHAgMBAAECgYARmXtmig6uudbSK/nprwhHMjlV
+NnpSO+6TfVYiYzRFnGwBOe7P8rM3FUMDH9HEumgL7Vdkb+VamdK3zaZ7RDIzAcDD
+R+OrO26Y1vyAa1eBX9w+k0EMFra8mKzsONEHYMIPJjjFmZhBsB+3mFD9qihWNpHH
+lpPoHZLTX32/OBT3wQJBAPai4Jp1mgemDMDvaPlfqFPK8AWPlxAtSnmx3x7DulKe
+75dns9Todip2olRgN3cr0fDRZ9hM3aWtPAt2ZXBm57cCQQDNEn0vwG6nwSjnZsVx
+A0/03kKGQOoQlEXZGFXKJUgoODQInwIt2rTsV9eRHqFEkq6H4lbPKqG/9EaPqR1R
+DFKxAkAIDbF/2a856LYp5qdq3TDF666Cv/mS0afI6YH7ozCGWiJAs2Yv4ZdaM52B
+W9Lz1T55upzFd10Vd96qESemz/VpAkAI/9K2kb9JZVSiMwRfHUIZANfyhE7BQ4B9
+MnAxWsl72luONUwnLv3ZkVFIcQuqsrUuCWS92qUWg2XFUCqVL/FBAkEA0v7qMq7f
+oWmjVu7HYpVUCPI87t9fZzo/GZ+AAKPhFLpLEbnDpvS8yau0bVxM9Zk/p9/BTGUM
+coLqkASQC28sJg==
 -----END PRIVATE KEY-----';
 
 $private = new \Ricochet\Key\PrivateKey($serialized);
@@ -25,8 +25,14 @@ echo "Full\n".$private->getPemFormatted().PHP_EOL;
 echo "Tor formatted\n";
 echo $private->getTorFormatted().PHP_EOL;
 
+$torControl = new TorControl\TorControl([
+    'hostname' => '127.0.0.1',
+    'port'     => 9051,
+    'password' => getenv('TOR_CONTROL_PASS'),
+    'authmethod' => \TorControl\TorControl::AUTH_METHOD_HASHEDPASSWORD,
+]);
 
-echo "getPublicKey\n";
-$public = $private->getPublicKey();
-$onion = $public->getOnion();
-echo $onion.PHP_EOL;
+$torControl->connect();
+$torControl->authenticate();
+$res = $torControl->executeCommand('DEL_ONION '. $private->getPublicKey()->getOnion());
+print_r($res);

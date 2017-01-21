@@ -15,7 +15,7 @@ $tc = new TorControl\TorControl(
     array(
         'hostname' => '127.0.0.1',
         'port'     => 9051,
-        'password' => 'testtesttesttest',
+        'password' => getenv('TOR_CONTROL_PASS'),
         'authmethod' => 1
     )
 );

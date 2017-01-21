@@ -71,24 +71,40 @@ class PrivateKey
         return new PrivateKey($serialized, $passphrase);
     }
 
+    /**
+     * @param string $data
+     * @return string
+     */
+    public function signSHA256($data)
+    {
+        $serialized = '';
+        openssl_pkey_export($this->private, $serialized);
 
+        $signature = '';
+        echo 'definitely openssl';
+        if (!openssl_sign($data, $signature, $this->private, OPENSSL_ALGO_SHA256)) {
+            throw new \RuntimeException('Failed to sign data');
+        }
+
+        return $signature;
+
+    }
 
     /**
      * @param string $data
      * @return string
      */
-    public function signaaaa($data)
+    public function signSHA2562($data)
     {
         $serialized = '';
         openssl_pkey_export($this->private, $serialized);
         $rsa = new RSA();
         $rsa->setHash('sha256');
         $rsa->setMGFHash('sha256');
-        $rsa->loadKey($serialized);;
+        $rsa->loadKey($serialized);
         $rsa->setSignatureMode(RSA::SIGNATURE_PKCS1);
         $signature = $rsa->sign($data);
         return $signature;
-
     }
 
     /**
@@ -100,23 +116,7 @@ class PrivateKey
         echo "signData: data: ".bin2hex($data).PHP_EOL;
         $hash = hash('sha256', $data, true);
         echo "signData: hash: ".bin2hex($hash).PHP_EOL;
-        return $this->signSha256($hash);
-    }
-
-    /**
-     * @param string $data
-     * @return string
-     */
-    public function signSha256($data)
-    {
-        echo "Called signSha256\n";
-
-        $signature = '';
-        if (!openssl_sign($data, $signature, $this->private, OPENSSL_ALGO_SHA256)) {
-            throw new \RuntimeException('Failed to sign data');
-        }
-
-        return $signature;
+        return $this->signSHA256($hash);
     }
 
     /**
