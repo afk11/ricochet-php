@@ -3,7 +3,6 @@
 namespace Ricochet\Test;
 
 
-use phpseclib\Crypt\RSA;
 use Ricochet\Key\PrivateKey;
 use Ricochet\Key\PublicKey;
 
@@ -53,52 +52,6 @@ pcHK9wN7mtWHIhFwhikP//NylrY1MaUxcPjvOKcdJ90k988nnmpZAgMBAAE=
         $this->assertEquals(hex2bin($this->aliceSignedData), $signatureSign256);
     }
 
-    private function rsa()
-    {
-        $rsa = new RSA;
-        $rsa->setHash('sha256');
-        $rsa->setMGFHash('sha256');
-        $rsa->setSignatureMode(RSA::SIGNATURE_PKCS1);
-        return $rsa;
-    }
-    public function rsaSignSHA256($message)
-    {
-        $rsa = $this->rsa();
-        $rsa->loadKey($this->alicePriv);
-        return $rsa->sign($message);
-    }
-
-    public function rsaSignData($message)
-    {
-        $message = hash('sha256', $message, true);
-        return $this->rsaSignSHA256($message);
-    }
-
-    public function rsaVerifySHA256($message, $signature)
-    {
-        $rsa = $this->rsa();
-        $rsa->loadKey($this->alicePriv);
-        $rsa->loadKey($rsa->getPublicKey(RSA::PUBLIC_FORMAT_PKCS1));
-        return $rsa->verify($message, $signature);
-    }
-    public function rsaVerifyData($message, $signature)
-    {
-        $message = hash('sha256', $message, true);
-        return $this->rsaVerifySHA256($message, $signature);
-    }
-
-    public function testAliceBob1()
-    {
-
-        $hash = "test data";
-        //$hash = hash('sha256', $hash, true);
-        $sign = $this->rsaSignSHA256($hash);
-        $this->assertEquals(hex2bin($this->aliceSignedData), $sign);
-
-        $result = $this->rsaVerifySHA256($hash, $sign);
-        $this->assertTrue($result);
-    }
-
     public function testSign()
     {
         $key = new PrivateKey($this->alicePriv);
@@ -108,11 +61,7 @@ pcHK9wN7mtWHIhFwhikP//NylrY1MaUxcPjvOKcdJ90k988nnmpZAgMBAAE=
         $publicKey = $key->getPublicKey();
 
         // Good signature
-        echo " == GOOD SIGNATURE == \n";
-        $backup = $this->rsaSignData($data);
-        echo "back: " . bin2hex($backup).PHP_EOL;
         $signature = $key->signData($data);
-        echo "good: " . bin2hex($signature).PHP_EOL;
         $this->assertTrue($publicKey->verifyData($data, $signature));
 
         // Bad signature
@@ -128,8 +77,6 @@ pcHK9wN7mtWHIhFwhikP//NylrY1MaUxcPjvOKcdJ90k988nnmpZAgMBAAE=
         // Compare to SHA256
         $dataDigest = hash('sha256', $data, true);
         $signature2 = $key->signSHA256($dataDigest);
-        echo "good2: " . bin2hex($signature2).PHP_EOL;
-        echo "back2: " . bin2hex($this->rsaSignSHA256($dataDigest)).PHP_EOL;
 
         $this->assertTrue($publicKey->verifySHA256($dataDigest, $signature2));
         $this->assertTrue($publicKey->verifyData($data, $signature2));
@@ -138,6 +85,4 @@ pcHK9wN7mtWHIhFwhikP//NylrY1MaUxcPjvOKcdJ90k988nnmpZAgMBAAE=
         $signaturep = hex2bin($this->aliceSignedData);
         $this->assertTrue($publicKey->verifySHA256($data, $signaturep));
     }
-
-
 }

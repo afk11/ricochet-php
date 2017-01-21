@@ -9,11 +9,6 @@ use phpseclib\Crypt\RSA;
 class PublicKey
 {
     /**
-     * @var resource
-     */
-    private $public;
-
-    /**
      * @var string
      */
     private $pem;
@@ -54,7 +49,6 @@ class PublicKey
         $rsa->setSignatureMode(RSA::SIGNATURE_PKCS1);
 
         $this->pem = $pem;
-        echo "public key has str: ".$pem.PHP_EOL;
         $this->rsa = $rsa;
 
     }
@@ -79,8 +73,6 @@ class PublicKey
         try {
             return $this->rsa->verify($data, $signature);
         } catch (\Exception $e) {
-            echo "exception\n";
-            echo $e->getMessage().PHP_EOL;
             return false;
         }
     }
